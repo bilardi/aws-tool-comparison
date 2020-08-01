@@ -1,0 +1,23 @@
+EC2:
+    Type: AWS::EC2::Instance
+    Properties:
+        ImageId: ${self:custom.resources.ImageId}
+        SubnetId: ${self:custom.resources.AppSubnet}
+        SecurityGroupIds:
+          - ${self:custom.resources.SecurityGroupId}
+        InstanceType: ${self:custom.resources.InstanceType}
+        DisableApiTermination: ${self:custom.resources.Protection}
+        Tags:
+        - Key: Name
+          Value: ${self:custom.resources.InstanceName}
+        - Key: Saving
+          Value: ${self:custom.resources.SavingValue}
+        - Key: ${self:custom.resources.ActionKey}
+          Value: ${self:custom.resources.ActionValue}
+        UserData:
+          Fn::Base64:
+            Fn::Sub: |
+              #!/bin/bash -xe
+              # run my script
+              wget -O - ${self:custom.resources.ScriptUrl} | bash
+    

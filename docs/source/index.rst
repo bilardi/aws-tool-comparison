@@ -14,6 +14,7 @@ Comparison of different methods for creating objects on your AWS account.
 
    overview
    cli
+   tool
 
 Coming soon
 #   sam

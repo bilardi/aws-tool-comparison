@@ -1,0 +1,77 @@
+service: lambda-test
+description: Deploy of one lambda and some resources depending on stage
+provider:
+  name: aws
+  stage: ${opt:stage, 'development'}
+  runtime: python3.7
+  region: ${opt:region, 'eu-west-1'}
+  memorySize: 512
+  timeout: 300
+  profile: ${opt:profile, ''}
+  stackTags:
+    Saving: ${self:custom.savingTags.saving.${self:provider.stage}, self:custom.savingTags.saving.default}
+    Delete: ${self:custom.savingTags.delete.${self:provider.stage}, self:custom.savingTags.delete.default} 
+  deploymentBucket:
+    blockPublicAccess: true
+  tags:
+    Saving: ${self:custom.savingTags.saving.${self:provider.stage}, self:custom.savingTags.saving.default}
+    Delete: ${self:custom.savingTags.delete.${self:provider.stage}, self:custom.savingTags.delete.default}
+  iamRoleStatements:
+    - Effect: Allow
+      Action:
+        - cloudformation:*
+        - ec2:*
+        - lambda:*
+        - logs:*
+        - iam:*
+        - rds:*
+        - s3:*
+      Resource: "*"
+
+custom:
+  pythonRequirements:
+    pythonBin: /usr/bin/python3
+  stage:
+    default: default
+    ec2-basic: ec2-basic
+    ec2-more: ec2-more
+  functionName:
+    default: saving-${self:provider.stage}
+  resources:
+    VpcId: vpc-b213e3cb
+    FromPort: 30000
+    ToPort: 30000
+    Protection: False
+    ImageId: ami-030d7f4bcfae3b935
+    AppSubnet: subnet-6d361b0b
+    SecurityGroupId: sg-05ab5779a25ef0938
+    InstanceType: t2.micro
+    InstanceName: Minetest
+    ScriptUrl: https://raw.githubusercontent.com/bilardi/minetest/master/install.sh
+    SavingValue: Enabled
+    ActionKey: Delete
+    ActionValue: '0 18 . . .'
+  savingTags:
+    saving:
+      default: Enabled
+    delete:
+      default: ${self:custom.resources.ActionValue}
+
+package:
+  include:
+    - ./aws-saving/**
+  exclude:
+    - ./aws-saving/tests/**
+    - ./aws-saving/docs/**
+
+plugins:
+  - serverless-python-requirements
+
+functions:
+  lambdaTest:
+    name: ${self:custom.functionName.${self:provider.stage}, self:custom.functionName.default}
+    handler: aws-saving/aws_saving/saving.main
+
+resources:
+  Description: ${self:service} - ${self:provider.stage}
+  Resources: ${file(./${self:custom.stage.${self:provider.stage}, self:custom.stage.default}.resources.yaml)}

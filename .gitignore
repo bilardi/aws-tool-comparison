@@ -4,3 +4,6 @@ docs/build
 *install.sh
 *aws-saving
 outfile
+.serverless
+node_modules
+package-lock.json

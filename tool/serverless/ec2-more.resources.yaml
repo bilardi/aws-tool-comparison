@@ -1,0 +1,36 @@
+SgEC2:
+  Type: AWS::EC2::SecurityGroup
+  Properties:
+    GroupDescription: Allow everything in egress and only your range in ingress
+    VpcId: ${self:custom.resources.VpcId}
+    SecurityGroupIngress:
+    - IpProtocol: udp
+      FromPort: ${self:custom.resources.FromPort}
+      ToPort: ${self:custom.resources.ToPort}
+      CidrIp: 0.0.0.0/0
+    SecurityGroupEgress:
+    - IpProtocol: '-1'
+      CidrIp: 0.0.0.0/0
+
+EC2:
+  Type: AWS::EC2::Instance
+  Properties:
+    ImageId: ${self:custom.resources.ImageId}
+    SubnetId: ${self:custom.resources.AppSubnet}
+    SecurityGroupIds:
+      - Ref: SgEC2
+    InstanceType: ${self:custom.resources.InstanceType}
+    DisableApiTermination: ${self:custom.resources.Protection}
+    Tags:
+      - Key: Name
+        Value: ${self:custom.resources.InstanceName}
+      - Key: Saving
+        Value: ${self:custom.resources.SavingValue}
+      - Key: ${self:custom.resources.ActionKey}
+        Value: ${self:custom.resources.ActionValue}
+    UserData:
+      Fn::Base64:
+          Fn::Sub: |
+              #!/bin/bash -xe
+              # run my script
+              wget -O - ${self:custom.resources.ScriptUrl} | bash
