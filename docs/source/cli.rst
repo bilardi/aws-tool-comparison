@@ -7,3 +7,4 @@ and you can manage all that you need by those commands and bash scripts.
 As an example, you can find some commands below.
 
 .. include:: ../../cli/lambda/README.rst
+.. include:: ../../cli/ec2/README.rst
