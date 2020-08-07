@@ -1,0 +1,82 @@
+[
+    {
+        "ParameterKey": "VpcId",
+        "ParameterValue": "vpc-b213e3cb"
+    },
+    {
+        "ParameterKey": "FromPort",
+        "ParameterValue": "30000"
+    },
+    {
+        "ParameterKey": "ToPort",
+        "ParameterValue": "30000"
+    },
+    {
+        "ParameterKey": "AmiID",
+        "ParameterValue": "ami-030d7f4bcfae3b935"
+    },
+    {
+        "ParameterKey": "AppSubnets",
+        "ParameterValue": "subnet-6d361b0b"
+    },
+    {
+        "ParameterKey": "EbsOptimized",
+        "ParameterValue": "false"
+    },
+    {
+        "ParameterKey": "InstanceType",
+        "ParameterValue": "t2.micro"
+    },
+    {
+        "ParameterKey": "KeyName",
+        "ParameterValue": "minetest"
+    },
+    {
+        "ParameterKey": "DisableApiTermination",
+        "ParameterValue": "false"
+    },
+    {
+        "ParameterKey": "InstanceName",
+        "ParameterValue": "minetest"
+    },
+    {
+        "ParameterKey": "DeviceName",
+        "ParameterValue": "/dev/xvda"
+    },
+    {
+        "ParameterKey": "VolumeSize",
+        "ParameterValue": "8"
+    },
+    {
+        "ParameterKey": "VolumeType",
+        "ParameterValue": "gp2"
+    },
+    {
+        "ParameterKey": "DeleteOnTermination",
+        "ParameterValue": "true"
+    },
+    {
+        "ParameterKey": "ScriptUrl",
+        "ParameterValue": "https://raw.githubusercontent.com/bilardi/minetest/master/install.sh"
+    },
+    {
+        "ParameterKey": "EvaluationPeriods",
+        "ParameterValue": "2"
+    },
+    {
+        "ParameterKey": "Period",
+        "ParameterValue": "300"
+    },
+    {
+        "ParameterKey": "Statistic",
+        "ParameterValue": "Average"
+    },
+    {
+        "ParameterKey": "Threshold",
+        "ParameterValue": "100"
+    },
+    {
+        "ParameterKey": "SNStopicName",
+        "ParameterValue": "SNS_STACK_NAME"
+    }
+]

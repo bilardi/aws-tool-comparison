@@ -8,3 +8,4 @@ As an example, you can find some commands below.
 
 .. include:: ../../cli/lambda/README.rst
 .. include:: ../../cli/ec2/README.rst
+.. include:: ../../cli/cloudformation/README.rst

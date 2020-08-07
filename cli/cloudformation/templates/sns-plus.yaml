@@ -1,0 +1,37 @@
+AWSTemplateFormatVersion: '2010-09-09'
+
+Description: SNS for alarms
+
+Parameters:
+
+  TopicName:
+    Description: Topic name
+    Type: String
+
+  DisplayName:
+    Description: Display name in the email
+    Type: String
+
+  Endpoint:
+    Description: Email subscribed
+    Type: String
+    
+Resources:
+
+  SNStopic:
+    Type: AWS::SNS::Topic
+    Properties: 
+      TopicName: !Ref TopicName
+      DisplayName: !Ref DisplayName
+      Subscription:
+        -
+          Endpoint: !Ref Endpoint
+          Protocol: email
+
+Outputs:
+
+  SNStopicArn:
+    Value: !Ref SNStopic
+    Export:
+      Name: !Sub "${AWS::StackName}-SNStopicArn"
+    

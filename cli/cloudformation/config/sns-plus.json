@@ -1,0 +1,14 @@
+[
+    {
+        "ParameterKey": "TopicName",
+        "ParameterValue": "alarms-sns"
+    },
+    {
+        "ParameterKey": "DisplayName",
+        "ParameterValue": "My alarms"
+    },
+    {
+        "ParameterKey": "Endpoint",
+        "ParameterValue": "your@email.net"
+    }
+]

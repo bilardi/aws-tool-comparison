@@ -1,0 +1,30 @@
+[
+    {
+        "ParameterKey": "AmiID",
+        "ParameterValue": "ami-030d7f4bcfae3b935"
+    },
+    {
+        "ParameterKey": "AppSubnets",
+        "ParameterValue": "subnet-6d361b0b"
+    },
+    {
+        "ParameterKey": "SecurityGroupId",
+        "ParameterValue": "sg-05ab5779a25ef0938"
+    },
+    {
+        "ParameterKey": "InstanceType",
+        "ParameterValue": "t2.micro"
+    },
+    {
+        "ParameterKey": "KeyName",
+        "ParameterValue": "minetest"
+    },
+    {
+        "ParameterKey": "InstanceName",
+        "ParameterValue": "minetest"
+    },
+    {
+        "ParameterKey": "ScriptUrl",
+        "ParameterValue": "https://raw.githubusercontent.com/bilardi/minetest/master/install.sh"
+    }
+]
