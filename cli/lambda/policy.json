@@ -1,0 +1,18 @@
+{
+    "Version": "2012-10-17",
+    "Statement": [
+        {
+            "Effect": "Allow",
+            "Action": [
+                "cloudformation:*",
+                "ec2:*",
+                "lambda:*",
+                "logs:*",
+                "iam:*",
+                "rds:*",
+                "s3:*"
+            ],
+            "Resource": "*"
+        }
+    ]
+}

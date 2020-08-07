@@ -28,7 +28,7 @@ The package is not self-consistent: you will find the installation on the offici
 Usage
 #####
 
-Read the instructions on `readthedocs <https://aws-tool-comparison.readthedocs.io/en/latest/>`_.
+Read the documentation on `readthedocs <https://aws-tool-comparison.readthedocs.io/en/latest/>`_.
 
 License
 #######
