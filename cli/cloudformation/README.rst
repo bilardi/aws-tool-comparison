@@ -17,13 +17,11 @@ The command for deploying a stack
     export PREFIX_STACK_FILENAME=your-filename
     aws cloudformation create-stack --stack-name $STACK_NAME --template-body file://./templates/$PREFIX_STACK_FILENAME.yaml --parameters file://./config/$PREFIX_STACK_FILENAME.json --capabilities CAPABILITY_NAMED_IAM
 
-When the stack will be created, you can get all information of the stack outputs that they are described in the `template <https://github.com/bilardi/compare.aws/blob/master/cli/cloudformation/templates/sns-plus.yaml>`_ Outputs section. By the command below you can get the stack outputs
+When the stack will be created, you can get all information of the stack outputs that they are described in the `template <https://github.com/bilardi/aws-tool-comparison/blob/master/cli/cloudformation/templates/sns-plus.yaml>`_ Outputs section. By the command below you can get the stack outputs
 
 .. code-block:: bash
 
     aws cloudformation describe-stacks --stack-name $STACK_NAME
-
-The script return the instanceId of EC2 that you can use in the commands described in the `aws-ec2 guide <https://github.com/bilardi/compare.aws/blob/master/cli/ec2/README.md>`_.
 
 For updating the stack after changes on parameters or templates files,
 
