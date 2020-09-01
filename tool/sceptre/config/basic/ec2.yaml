@@ -1,0 +1,12 @@
+template_path: ec2-basic.yaml
+parameters:
+    AmiID: {{ AmiID }}
+    AppSubnets: {{ AppSubnets }}
+    SecurityGroupId: {{ SecurityGroupId }}
+    InstanceType: {{ InstanceType }}
+    KeyName: {{ KeyName }}
+    InstanceName: {{ InstanceName }}
+    ScriptUrl: {{ ScriptUrl }}
+stack_tags:
+    Saving: {{ Saving_EC2 }}
+    Delete: {{ Delete_EC2 }}

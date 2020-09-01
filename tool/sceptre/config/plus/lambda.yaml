@@ -1,0 +1,29 @@
+template_path: lambda-plus.yaml
+parameters:
+    LambdaName: {{ LambdaName }}
+    MemorySize: '{{ MemorySize }}'
+    Runtime: {{ Runtime }}
+    Timeout: '{{ Timeout }}'
+    S3bucket: {{ S3bucket }}
+    LambdaZipS3key: {{ LambdaZipS3key }}
+    EvaluationPeriods: '{{ EvaluationPeriods }}'
+    Period: '{{ Period }}'
+    Statistic: {{ Statistic }}
+    Threshold: '{{ Threshold }}'
+    SNStopicName: !stack_output plus/sns.yaml::SNStopicArn
+stack_tags:
+    Saving: {{ Saving_lambda }}
+    Delete: {{ Delete_lambda }}
+hooks:
+  before_create:
+    - !git_clone
+    - !s3_package {{ RepositoryFolder }}
+  before_update:
+    - !git_clone
+    - !s3_package {{ RepositoryFolder }}
+sceptre_user_data:
+    GitRepository: {{ GitRepository }}
+    RepositoryFolder: {{ RepositoryFolder }}
+    Code:
+      S3Bucket: {{ S3bucket }}
+      S3Key: {{ LambdaZipS3key }}

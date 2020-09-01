@@ -1,0 +1,261 @@
+AWSTemplateFormatVersion: '2010-09-09'
+
+Description: Stack with a EC2 infrastructure
+
+Parameters:
+
+  VpcId:
+    Description: The vpc id
+    Type: String
+  
+  FromPort:
+    Description: The first port of the range that it is allowed
+    Type: String
+    
+  ToPort:
+    Description: The last port of the range that it is allowed
+    Type: String
+      
+  AmiID:
+    Description: AMI id to use
+    Type: String
+
+  AppSubnets:
+    Description: The subnets where to create the EC2
+    Type: String
+
+  EbsOptimized:
+    Description: Ebs Optimized
+    Type: String
+  
+  InstanceType:
+    Description: Type of instance
+    Type: String
+  
+  KeyName:
+    Description: Key Name
+    Type: String
+  
+  DisableApiTermination:
+    Description: Disable Api Termination of EC2
+    Type: String
+
+  InstanceName:
+    Description: Name of instance
+    Type: String
+
+  DeviceName:
+    Description: Name of device
+    Type: String
+
+  VolumeSize:
+    Description: Volume size
+    Type: String
+
+  VolumeType:
+    Description: Volume type
+    Type: String
+
+  DeleteOnTermination:
+    Description: Delete On Termination of Volume
+    Type: String
+        
+  ScriptUrl:
+    Description: Web url of the raw bash script
+    Type: String
+
+  EvaluationPeriods:
+    Description: Evaluation periods of alarm
+    Type: String
+
+  Period:
+    Description: Period of alarm
+    Type: String
+
+  Statistic:
+    Description: Statistic for alarm
+    Type: String
+
+  Threshold:
+    Description: Threshold of alarm
+    Type: String
+        
+  SNStopicName:
+    Description: Name of SNS topic stack
+    Type: String
+
+Resources:
+
+  InstanceRole:
+    Type: AWS::IAM::Role
+    Properties:
+      AssumeRolePolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+        - Effect: Allow
+          Principal:
+            Service:
+            - ec2.amazonaws.com
+          Action:
+          - sts:AssumeRole
+      Path: /EC2/
+      Policies:
+      - PolicyName: AmazonCloudWatchLogsAccess
+        PolicyDocument:
+          Statement:
+          - Effect: Allow
+            Action:
+            - logs:CreateLogGroup
+            - logs:CreateLogStream
+            - logs:PutLogEvents
+            - logs:DescribeLogStreams
+            Resource: arn:aws:logs:*:*:*
+          Version: '2012-10-17'
+      - PolicyName: AmazonEC2Access
+        PolicyDocument:
+          Statement:
+          - Effect: Allow
+            Action:
+            - ec2:Describe*
+            Resource: '*'
+          Version: '2012-10-17'
+
+  IamEC2Profile:
+    Type: AWS::IAM::InstanceProfile
+    Properties:
+      Path: /EC2/
+      Roles:
+      - Ref: InstanceRole
+
+  SgEC2:
+    Type: AWS::EC2::SecurityGroup
+    Properties:
+      GroupDescription: Allow everything in egress and only your range in ingress
+      VpcId: !Ref VpcId
+      SecurityGroupIngress:
+    #   # for development
+    #   - IpProtocol: tcp
+    #     FromPort: 22
+    #     ToPort: 22
+    #     CidrIp: 0.0.0.0/0
+      - IpProtocol: udp
+        FromPort: !Ref FromPort
+        ToPort: !Ref ToPort
+        CidrIp: 0.0.0.0/0
+      SecurityGroupEgress:
+      - IpProtocol: '-1'
+        CidrIp: 0.0.0.0/0
+
+  EC2:
+    Type: AWS::EC2::Instance
+    Properties:
+      ImageId: !Ref AmiID
+      SubnetId: !Ref AppSubnets
+      SecurityGroupIds:
+        - !Ref SgEC2
+      EbsOptimized: !Ref EbsOptimized
+      InstanceType: !Ref InstanceType
+      IamInstanceProfile: !Ref IamEC2Profile
+      DisableApiTermination: !Ref DisableApiTermination
+      KeyName: !Ref KeyName
+      Tags:
+        - Key: Name
+          Value: !Ref InstanceName
+        - Key: Saving
+          Value: Enabled
+        - Key: Delete
+          Value: '0 18 . . .'
+      BlockDeviceMappings:
+        - DeviceName: !Ref DeviceName
+          Ebs:
+            VolumeSize: !Ref VolumeSize
+            VolumeType: !Ref VolumeType
+            DeleteOnTermination: !Ref DeleteOnTermination
+      UserData:
+        Fn::Base64:
+            Fn::Sub: |
+                #!/bin/bash -xe
+                # run my script
+                wget -O - ${ScriptUrl} | bash
+
+  CPUUtilizationAlarm:
+    Type: AWS::CloudWatch::Alarm
+    Properties:
+      OKActions:
+        - !Ref SNStopicName
+      AlarmActions:
+        - !Ref SNStopicName
+      AlarmDescription: !Sub 'CPUUtilization of ${InstanceName} on AWS ${AWS::AccountId}'
+      AlarmName: !Sub 'CPUUtilization of ${InstanceName} on AWS ${AWS::AccountId}'
+#      AlarmName: !Join [ " ", [ "CPUUtilization of", !Ref InstanceName, "on AWS ", !Ref Account ] ]
+      ComparisonOperator: GreaterThanOrEqualToThreshold
+      Dimensions:
+        - Name: InstanceId
+          Value: !Ref EC2
+      EvaluationPeriods: !Ref EvaluationPeriods
+      MetricName: CPUUtilization
+      Namespace: AWS/EC2
+      Period: !Ref Period
+      Statistic: !Ref Statistic
+      Threshold: !Ref Threshold
+      TreatMissingData: missing
+
+  Dashboard:
+    Type: AWS::CloudWatch::Dashboard
+    Properties:
+      DashboardName: !Ref InstanceName
+      DashboardBody: !Sub |
+        {
+          "widgets":[
+            {
+              "type":"metric","x":0,"y":0,"width":12,"height":6,
+              "properties":{
+                "view":"timeSeries","stacked":false,
+                "metrics":[
+                    ["AWS/EC2","CPUUtilization","InstanceId","${EC2}"]
+                ],
+                "region":"${AWS::Region}"
+              }
+            },
+            {
+              "type":"metric","x":12,"y":0,"width":12,"height":6,
+              "properties":{
+                "view":"timeSeries",
+                "stacked":false,
+                "metrics":[
+                  ["AWS/EC2","NetworkIn","InstanceId","${EC2}"],
+                  ["AWS/EC2","NetworkOut","InstanceId","${EC2}"]
+                ],
+                "region":"${AWS::Region}","title":"Network"
+              }
+            },
+            {
+              "type":"metric","x":0,"y":0,"width":12,"height":6,
+              "properties":{
+                "view":"timeSeries","stacked":false,
+                "metrics":[
+                  ["AWS/EC2","StatusCheckFailed_Instance","InstanceId","${EC2}"]
+                ],
+                "region":"${AWS::Region}"
+              }
+            },
+            {
+              "type":"metric","x":12,"y":0,"width":12,"height":6,
+              "properties":{
+                "view":"timeSeries","stacked":false,
+                "metrics":[
+                  ["AWS/EC2","StatusCheckFailed_System","InstanceId","${EC2}"]
+                ],
+                "region":"${AWS::Region}","period":300
+              }
+            }
+          ]
+        }
+
+Outputs:
+
+  IP:
+    Value: !GetAtt EC2.PrivateIp
+
+  DashboardUrl:
+    Value: !Sub "https://${AWS::Region}.console.aws.amazon.com/cloudwatch/home#dashboards:name=${Dashboard}"

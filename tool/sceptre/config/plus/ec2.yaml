@@ -1,0 +1,25 @@
+template_path: ec2-plus.yaml
+parameters:
+    VpcId: {{ VpcId }}
+    FromPort: '{{ FromPort }}'
+    ToPort: '{{ ToPort }}'
+    AmiID: {{ AmiID }}
+    AppSubnets: {{ AppSubnets }}
+    EbsOptimized: '{{ EbsOptimized }}'
+    InstanceType: {{ InstanceType }}
+    KeyName: {{ KeyName }}
+    InstanceName: {{ InstanceName }}
+    DisableApiTermination: '{{ DisableApiTermination }}'
+    DeviceName: {{ DeviceName }}
+    VolumeSize: '{{ VolumeSize }}'
+    VolumeType: {{ VolumeType }}
+    DeleteOnTermination: '{{ DeleteOnTermination }}'
+    ScriptUrl: {{ ScriptUrl }}
+    EvaluationPeriods: '{{ EvaluationPeriods }}'
+    Period: '{{ Period }}'
+    Statistic: {{ Statistic }}
+    Threshold: '{{ Threshold }}'
+    SNStopicName: !stack_output plus/sns.yaml::SNStopicArn
+stack_tags:
+    Saving: {{ Saving_EC2 }}
+    Delete: {{ Delete_EC2 }}

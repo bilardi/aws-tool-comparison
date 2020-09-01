@@ -1,0 +1,4 @@
+# https://sceptre.cloudreach.com/latest/docs/stack_group_config.html#cascading-config
+TopicName: alarms-sns
+DisplayName: 'My alarms'
+Endpoint: your@email.net

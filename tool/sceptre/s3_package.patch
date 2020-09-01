@@ -1,0 +1,11 @@
+--- sceptre-zip-code-s3/hooks/s3_package/s3_package.py	2020-08-30 22:06:45.000000000 +0200
++++ hooks/s3_package/s3_package.py	2020-08-30 21:42:06.000000000 +0200
+@@ -65,7 +65,7 @@
+ 
+         fn_dist_dir = os.path.join(fn_root_dir, self.TARGET)
+ 
+-        command = 'make -C {}'.format(fn_root_dir)
++        command = 'cd {}; pip install -t dist -r requirements.txt; cp -rf $(echo {} | sed "s/-/_/") dist/; cd -;'.format(fn_root_dir, fn_root_dir)
+ 
+         self.logger.info(
+             "Making dependencies with '{}' command, output hidden.".format(command)

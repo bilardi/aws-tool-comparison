@@ -1,0 +1,49 @@
+# https://sceptre.cloudreach.com/latest/docs/stack_group_config.html
+project_code: {{ var.project_code | default("atc") }} # aws-tool-comparison
+region: {{ var.region | default("eu-west-1") }}
+
+# ec2 - Minetest server
+
+## for all environments
+AmiID: ami-030d7f4bcfae3b935
+AppSubnets: subnet-6d361b0b
+InstanceType: t2.micro
+KeyName: minetest
+InstanceName: minetest
+ScriptUrl: https://raw.githubusercontent.com/bilardi/minetest/master/install.sh
+
+## for more and plus environments
+VpcId: vpc-b213e3cb
+FromPort: 30000
+ToPort: 30000
+EbsOptimized: false
+DisableApiTermination: false
+DeviceName: /dev/xvda
+VolumeSize: 8
+VolumeType: gp2
+DeleteOnTermination: true
+EvaluationPeriods: 2
+Period: 300
+Statistic: Average
+Threshold: 100
+
+# lambda
+GitRepository: https://github.com/bilardi/aws-saving
+RepositoryFolder: aws-saving
+LambdaName: aws_saving
+MemorySize: 512
+Runtime: python3.7
+Timeout: 300
+S3bucket: digi-custom-configurations
+#S3bucket: your-bucket-name
+LambdaZipS3key: cli/cloudformation/templates/lambda/code.zip
+EvaluationPeriods: 2
+Period: 60
+Statistic: Average
+Threshold: 1
+
+# tags
+Saving_EC2: Enabled
+Delete_EC2: '0 18 . . .'
+Saving_lambda: Disabled
+Delete_lambda: '0 18 30 2 .'

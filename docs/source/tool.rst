@@ -6,6 +6,7 @@ it is not possible to list all them or to keep an updated list.
 
 As an example, you can find some tools below.
 
+.. include:: ../../tool/sceptre/README.rst
 .. include:: ../../tool/serverless/README.rst
 
 Coming soon for other tools.

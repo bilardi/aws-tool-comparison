@@ -1,0 +1,174 @@
+AWSTemplateFormatVersion: '2010-09-09'
+
+Description: Stack with only the lambda infrastructure
+
+Parameters:
+
+  LambdaName:
+    Description: Lambda name
+    Type: String
+
+  MemorySize:
+    Description: Size of lambda memory
+    Type: String
+
+  Runtime:
+    Description: Runtime
+    Type: String
+
+  Timeout:
+    Description: Timeout
+    Type: String
+  
+  S3bucket:
+    Description: S3 bucket of the lambda ZipFile
+    Type: String
+
+  LambdaZipS3key:
+    Description: S3 key of the lambda ZipFile
+    Type: String
+
+  EvaluationPeriods:
+    Description: Evaluation periods of alarm
+    Type: String
+
+  Period:
+    Description: Period of alarm
+    Type: String
+
+  Statistic:
+    Description: Statistic for alarm
+    Type: String
+
+  Threshold:
+    Description: Threshold of alarm
+    Type: String
+  
+  SNStopicName:
+    Description: Name of SNS topic stack
+    Type: String
+  
+Resources:
+
+  LambdaRole:
+    Type: AWS::IAM::Role
+    Properties:
+      AssumeRolePolicyDocument:
+        Statement:
+        - Effect: Allow
+          Principal:
+            Service: [lambda.amazonaws.com]
+          Action: sts:AssumeRole
+      Policies:
+      - PolicyName: LambdaPolicy
+        PolicyDocument:
+          Statement:
+          - Effect: Allow
+            Action:
+              - cloudformation:*
+              - ec2:*
+              - lambda:*
+              - logs:*
+              - iam:*
+              - rds:*
+              - s3:*
+            Resource: "*"
+          Version: '2012-10-17'
+
+  Lambda:
+    Type: AWS::Lambda::Function
+    Properties:
+      FunctionName: !Ref LambdaName
+      Handler: aws_saving/saving.main
+      Role: !GetAtt LambdaRole.Arn
+      MemorySize: !Ref MemorySize
+      Runtime: !Ref Runtime
+      Timeout: !Ref Timeout
+      Code:
+        S3Bucket: !Ref S3bucket
+        S3Key: !Ref LambdaZipS3key
+      Tags:
+        - Key: Name
+          Value: !Ref LambdaName
+        - Key: Saving
+          Value: Enabled
+        - Key: Delete
+          Value: '0 18 . . .'
+  
+  ErrorsAlarm:
+    Type: AWS::CloudWatch::Alarm
+    Properties:
+      OKActions:
+        - !Ref SNStopicName
+      AlarmActions:
+        - !Ref SNStopicName
+      AlarmDescription: !Sub 'Errors of ${LambdaName} on AWS ${AWS::AccountId}'
+      AlarmName: !Sub 'Errors of ${LambdaName} on AWS ${AWS::AccountId}'
+      ComparisonOperator: GreaterThanOrEqualToThreshold
+      Dimensions:
+        - Name: FunctionName
+          Value: !Ref Lambda
+      EvaluationPeriods: !Ref EvaluationPeriods
+      MetricName: Errors
+      Namespace: AWS/Lambda
+      Period: !Ref Period
+      Statistic: !Ref Statistic
+      Threshold: !Ref Threshold
+      TreatMissingData: missing
+
+  Dashboard:
+    Type: AWS::CloudWatch::Dashboard
+    Properties:
+      DashboardName: !Ref LambdaName
+      DashboardBody: !Sub |
+        {
+          "widgets":[
+            {
+              "type":"metric","x":0,"y":0,"width":12,"height":6,
+              "properties":{
+                "view":"timeSeries","stacked":false,
+                "metrics":[
+                    ["AWS/Lambda","Invocations","FunctionName","${Lambda}"]
+                ],
+                "region":"${AWS::Region}"
+              }
+            },
+            {
+              "type":"metric","x":12,"y":0,"width":12,"height":6,
+              "properties":{
+                "view":"timeSeries",
+                "stacked":false,
+                "metrics":[
+                  ["AWS/Lambda","Errors","FunctionName","${Lambda}"]
+                ],
+                "region":"${AWS::Region}"
+              }
+            },
+            {
+              "type":"metric","x":0,"y":0,"width":12,"height":6,
+              "properties":{
+                "view":"timeSeries","stacked":false,
+                "metrics":[
+                  ["AWS/Lambda","ConcurrentExecutions","FunctionName","${Lambda}"]
+                ],
+                "region":"${AWS::Region}"
+              }
+            },
+            {
+              "type":"metric","x":12,"y":0,"width":12,"height":6,
+              "properties":{
+                "view":"timeSeries","stacked":false,
+                "metrics":[
+                  ["AWS/Lambda","Duration","FunctionName","${Lambda}"]
+                ],
+                "region":"${AWS::Region}"
+              }
+            }
+          ]
+        }
+
+Outputs:
+
+  DashboardUrl:
+    Value: !Sub "https://${AWS::Region}.console.aws.amazon.com/cloudwatch/home#dashboards:name=${Dashboard}"
+

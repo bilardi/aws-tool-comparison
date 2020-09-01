@@ -1,0 +1,60 @@
+AWSTemplateFormatVersion: '2010-09-09'
+
+Description: Stack with only the EC2 infrastructure
+
+Parameters:
+
+  AmiID:
+    Description: AMI id to use
+    Type: String
+
+  AppSubnets:
+    Description: The subnets where to create the EC2
+    Type: String
+
+  SecurityGroupId:
+    Description: The security group id for the EC2
+    Type: String
+
+  InstanceType:
+    Description: Type of instance
+    Type: String
+
+  KeyName:
+    Description: Private key
+    Type: String
+
+  InstanceName:
+    Description: Name of instance
+    Type: String
+
+  ScriptUrl:
+    Description: Web url of the raw bash script
+    Type: String
+
+Resources:
+
+  EC2:
+    Type: AWS::EC2::Instance
+    Properties:
+      ImageId: !Ref AmiID
+      SubnetId: !Ref AppSubnets
+      SecurityGroupIds:
+        - !Ref SecurityGroupId
+      InstanceType: !Ref InstanceType
+      KeyName: !Ref KeyName
+      Tags:
+        - Key: Name
+          Value: !Ref InstanceName
+        - Key: Saving
+          Value: Enabled
+        - Key: Delete
+          Value: '0 18 . . .'
+      UserData:
+        Fn::Base64:
+            Fn::Sub: |
+                #!/bin/bash -xe
+                # run my script
+                wget -O - ${ScriptUrl} | bash
+
+Outputs: {}
