@@ -34,8 +34,7 @@ LambdaName: aws_saving
 MemorySize: 512
 Runtime: python3.7
 Timeout: 300
-S3bucket: digi-custom-configurations
-#S3bucket: your-bucket-name
+S3bucket: your-bucket-name
 LambdaZipS3key: cli/cloudformation/templates/lambda/code.zip
 EvaluationPeriods: 2
 Period: 60
