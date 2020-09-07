@@ -1,0 +1,5 @@
+template_path: sns-plus.yaml
+parameters:
+    TopicName: {{ TopicName }}
+    DisplayName: {{ DisplayName }}
+    Endpoint: {{ Endpoint }}

@@ -14,9 +14,9 @@ Comparison of different methods for creating objects on your AWS account.
 
    overview
    cli
+   sam
    tool
 
 Coming soon
-#   sam
 #   cdk
 #   other tool

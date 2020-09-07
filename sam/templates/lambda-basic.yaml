@@ -1,0 +1,77 @@
+AWSTemplateFormatVersion: '2010-09-09'
+
+Transform: 'AWS::Serverless-2016-10-31'
+
+Description: Stack with only the lambda infrastructure
+
+Parameters:
+
+  LambdaName:
+    Description: Lambda name
+    Type: String
+
+  MemorySize:
+    Description: Size of lambda memory
+    Type: String
+
+  Runtime:
+    Description: Runtime
+    Type: String
+
+  Timeout:
+    Description: Timeout
+    Type: String
+
+  S3bucket:
+    Description: S3 bucket of the lambda ZipFile
+    Type: String
+
+  LambdaZipS3key:
+    Description: S3 key of the lambda ZipFile
+    Type: String
+
+Resources:
+
+  LambdaRole:
+    Type: AWS::IAM::Role
+    Properties:
+      AssumeRolePolicyDocument:
+        Statement:
+        - Effect: Allow
+          Principal:
+            Service: [lambda.amazonaws.com]
+          Action: sts:AssumeRole
+      Policies:
+      - PolicyName: LambdaPolicy
+        PolicyDocument:
+          Statement:
+          - Effect: Allow
+            Action:
+              - cloudformation:*
+              - ec2:*
+              - lambda:*
+              - logs:*
+              - iam:*
+              - rds:*
+              - s3:*
+            Resource: "*"
+          Version: '2012-10-17'
+
+  Lambda:
+    Type: AWS::Serverless::Function
+    Properties:
+      FunctionName: !Ref LambdaName
+      Handler: aws_saving/saving.main
+      Role: !GetAtt LambdaRole.Arn
+      MemorySize: !Ref MemorySize
+      Runtime: !Ref Runtime
+      Timeout: !Ref Timeout
+      CodeUri: 
+        Bucket: !Ref S3bucket
+        Key: !Ref LambdaZipS3key
+      Tags:
+        Name: !Ref LambdaName
+        Saving: Enabled
+        Delete: '0 18 . . .'  
+
+Outputs: {}

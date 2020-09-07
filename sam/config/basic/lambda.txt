@@ -1,0 +1,6 @@
+ParameterKey=LambdaName,ParameterValue=test_aws_saving
+ParameterKey=MemorySize,ParameterValue=512
+ParameterKey=Runtime,ParameterValue=python3.7
+ParameterKey=Timeout,ParameterValue=300
+ParameterKey=S3bucket,ParameterValue=your-bucket-name
+ParameterKey=LambdaZipS3key,ParameterValue=cli/cloudformation/templates/lambda/code.zip
