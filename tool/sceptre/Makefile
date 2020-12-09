@@ -22,4 +22,4 @@ compile: patch
 
 .PHONY: install # install requirements
 install: compile
-	pip install sceptre==$(VERSION)
+	pip3 install -r requirements.txt
