@@ -1,0 +1,14 @@
+version: 0.2
+phases:
+  install:
+    commands:
+      - 'bash ${PWD}/cdk/python/build.sh'
+  build:
+    commands:
+      - 'STAGE=$ENV bash ${PWD}/cdk/python/deploy.sh'
+cache:
+  paths:
+    - '**/*'
+artifacts:
+  files:
+    - '**/*'

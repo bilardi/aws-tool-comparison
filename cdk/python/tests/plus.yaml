@@ -1,0 +1,227 @@
+Parameters:
+  AssetParameters9cc8199e0fe93d7f01d1b2b231bb687a12a00de795a274fecb02f7860538e214ArtifactHash:
+    Description: Artifact hash for asset "9cc8199e0fe93d7f01d1b2b231bb687a12a00de795a274fecb02f7860538e214"
+    Type: String
+  AssetParameters9cc8199e0fe93d7f01d1b2b231bb687a12a00de795a274fecb02f7860538e214S3Bucket:
+    Description: S3 bucket for asset "9cc8199e0fe93d7f01d1b2b231bb687a12a00de795a274fecb02f7860538e214"
+    Type: String
+  AssetParameters9cc8199e0fe93d7f01d1b2b231bb687a12a00de795a274fecb02f7860538e214S3VersionKey:
+    Description: S3 key for asset version "9cc8199e0fe93d7f01d1b2b231bb687a12a00de795a274fecb02f7860538e214"
+    Type: String
+Resources:
+  LambdaRole:
+    Properties:
+      AssumeRolePolicyDocument:
+        Statement:
+        - Action: sts:AssumeRole
+          Effect: Allow
+          Principal:
+            Service: lambda.amazonaws.com
+        Version: '2012-10-17'
+    Type: AWS::IAM::Role
+  LambdaRoleDefaultPolicy:
+    Properties:
+      PolicyDocument:
+        Statement:
+        - Action:
+          - cloudformation:*
+          - ec2:*
+          - lambda:*
+          - logs:*
+          - iam:*
+          - rds:*
+          - s3:*
+          Effect: Allow
+          Resource: '*'
+        Version: '2012-10-17'
+      PolicyName: LambdaRoleDefaultPolicy
+      Roles:
+      - Ref: LambdaRole
+    Type: AWS::IAM::Policy
+  SecurityGroup:
+    Properties:
+      GroupDescription: test/SecurityGroup
+      SecurityGroupEgress:
+      - CidrIp: 0.0.0.0/0
+        Description: Allow all outbound traffic by default
+        IpProtocol: '-1'
+      SecurityGroupIngress:
+      - CidrIp: 0.0.0.0/0
+        Description: from 0.0.0.0/0:sr
+        FromPort: {}
+        IpProtocol: udp
+        ToPort: {}
+      VpcId: vpc-12345
+    Type: AWS::EC2::SecurityGroup
+  Topic:
+    Properties:
+      DisplayName: My alarms
+      TopicName: alarms-sns
+    Type: AWS::SNS::Topic
+  Topicmyemailnet:
+    Properties:
+      Endpoint: my@email.net
+      Protocol: email
+      TopicArn:
+        Ref: Topic
+    Type: AWS::SNS::Subscription
+  minetesttest:
+    DependsOn:
+    - minetesttestInstanceRole
+    Properties:
+      AvailabilityZone: dummy1a
+      IamInstanceProfile:
+        Ref: minetesttestInstanceProfile
+      ImageId: ami-030d7f4bcfae3b935
+      InstanceType: t2.micro
+      KeyName: minetest
+      SecurityGroupIds:
+      - Fn::GetAtt:
+        - SecurityGroup
+        - GroupId
+      SubnetId: p-12345
+      Tags:
+      - Key: Delete
+        Value: 0 18 . . .
+      - Key: Name
+        Value: minetest-test
+      - Key: Saving
+        Value: Enabled
+      UserData:
+        Fn::Base64: '#!/bin/bash
+
+          wget -O - https://raw.githubusercontent.com/bilardi/minetest/master/install.sh
+          | bash'
+    Type: AWS::EC2::Instance
+  minetesttestAlarm:
+    Properties:
+      AlarmActions:
+      - Ref: Topic
+      AlarmDescription: CPUUtilization of minetest-test on AWS 1234
+      AlarmName: CPUUtilization of minetest-test on AWS 1234
+      ComparisonOperator: GreaterThanOrEqualToThreshold
+      Dimensions:
+      - Name: InstanceName
+        Value: minetest-test
+      EvaluationPeriods: {}
+      MetricName: CPUUtilization
+      Namespace: AWS/EC2
+      OKActions:
+      - Ref: Topic
+      Period: {}
+      Statistic: Average
+      Threshold: {}
+      TreatMissingData: missing
+    Type: AWS::CloudWatch::Alarm
+  minetesttestDashboard:
+    Properties:
+      DashboardBody:
+        Fn::Join:
+        - ''
+        - - '{"widgets":[{"type":"metric","width":12,"height":6,"x":0,"y":0,"properties":{"view":"timeSeries","region":"'
+          - Ref: AWS::Region
+          - '","metrics":[["AWS/EC2","CPUUtilization","InstanceId","minetest-test"]],"yAxis":{}}},{"type":"metric","width":12,"height":6,"x":12,"y":0,"properties":{"view":"timeSeries","region":"'
+          - Ref: AWS::Region
+          - '","metrics":[["AWS/EC2","NetworkIn","InstanceId","minetest-test"]],"yAxis":{}}},{"type":"metric","width":12,"height":6,"x":0,"y":6,"properties":{"view":"timeSeries","region":"'
+          - Ref: AWS::Region
+          - '","metrics":[["AWS/EC2","StatusCheckFailed_Instance","InstanceId","minetest-test"]],"yAxis":{}}},{"type":"metric","width":12,"height":6,"x":12,"y":6,"properties":{"view":"timeSeries","region":"'
+          - Ref: AWS::Region
+          - '","metrics":[["AWS/EC2","StatusCheckFailed_System","InstanceId","minetest-test"]],"yAxis":{}}}]}'
+      DashboardName: minetest-test
+    Type: AWS::CloudWatch::Dashboard
+  minetesttestInstanceProfile:
+    Properties:
+      Roles:
+      - Ref: minetesttestInstanceRole
+    Type: AWS::IAM::InstanceProfile
+  minetesttestInstanceRole:
+    Properties:
+      AssumeRolePolicyDocument:
+        Statement:
+        - Action: sts:AssumeRole
+          Effect: Allow
+          Principal:
+            Service: ec2.amazonaws.com
+        Version: '2012-10-17'
+      Tags:
+      - Key: Delete
+        Value: 0 18 . . .
+      - Key: Name
+        Value: minetest-test
+      - Key: Saving
+        Value: Enabled
+    Type: AWS::IAM::Role
+  savingtest:
+    DependsOn:
+    - LambdaRoleDefaultPolicy
+    - LambdaRole
+    Properties:
+      Code:
+        S3Bucket:
+          Ref: AssetParameters9cc8199e0fe93d7f01d1b2b231bb687a12a00de795a274fecb02f7860538e214S3Bucket
+        S3Key:
+          Fn::Join:
+          - ''
+          - - Fn::Select:
+              - {}
+              - Fn::Split:
+                - '||'
+                - Ref: AssetParameters9cc8199e0fe93d7f01d1b2b231bb687a12a00de795a274fecb02f7860538e214S3VersionKey
+            - Fn::Select:
+              - {}
+              - Fn::Split:
+                - '||'
+                - Ref: AssetParameters9cc8199e0fe93d7f01d1b2b231bb687a12a00de795a274fecb02f7860538e214S3VersionKey
+      Handler: aws_saving/saving.main
+      MemorySize: {}
+      Role:
+        Fn::GetAtt:
+        - LambdaRole
+        - Arn
+      Runtime: python3.8
+      Tags:
+      - Key: Delete
+        Value: 0 18 . . .
+      - Key: Name
+        Value: saving-test
+      - Key: Saving
+        Value: Enabled
+      Timeout: {}
+    Type: AWS::Lambda::Function
+  savingtestAlarm:
+    Properties:
+      AlarmActions:
+      - Ref: Topic
+      AlarmDescription: Errors of saving-test on AWS 1234
+      AlarmName: Errors of saving-test on AWS 1234
+      ComparisonOperator: GreaterThanOrEqualToThreshold
+      Dimensions:
+      - Name: FunctionName
+        Value: saving-test
+      EvaluationPeriods: {}
+      MetricName: Errors
+      Namespace: AWS/Lambda
+      OKActions:
+      - Ref: Topic
+      Period: {}
+      Statistic: Average
+      Threshold: {}
+      TreatMissingData: missing
+    Type: AWS::CloudWatch::Alarm
+  savingtestDashboard:
+    Properties:
+      DashboardBody:
+        Fn::Join:
+        - ''
+        - - '{"widgets":[{"type":"metric","width":12,"height":6,"x":0,"y":0,"properties":{"view":"timeSeries","region":"'
+          - Ref: AWS::Region
+          - '","metrics":[["AWS/Lambda","Invocations","FunctionName","saving-test"]],"yAxis":{}}},{"type":"metric","width":12,"height":6,"x":12,"y":0,"properties":{"view":"timeSeries","region":"'
+          - Ref: AWS::Region
+          - '","metrics":[["AWS/Lambda","Errors","FunctionName","saving-test"]],"yAxis":{}}},{"type":"metric","width":12,"height":6,"x":0,"y":6,"properties":{"view":"timeSeries","region":"'
+          - Ref: AWS::Region
+          - '","metrics":[["AWS/Lambda","ConcurrentExecutions","FunctionName","saving-test"]],"yAxis":{}}},{"type":"metric","width":12,"height":6,"x":12,"y":6,"properties":{"view":"timeSeries","region":"'
+          - Ref: AWS::Region
+          - '","metrics":[["AWS/Lambda","Duration","FunctionName","saving-test"]],"yAxis":{}}}]}'
+      DashboardName: saving-test
+    Type: AWS::CloudWatch::Dashboard
+

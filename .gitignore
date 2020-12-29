@@ -1,13 +1,34 @@
 *#*#
 *~
+
+# outline files
 docs/build
 *install.sh
 *aws-saving
 outfile
+
+# Serverless
 .serverless
 node_modules
 package-lock.json
+
+# Sceptre
 *.rej
 hooks
 resolvers
+
+# SAM
 .aws-sam
+
+# package
+*.swp
+package-lock.json
+__pycache__
+.pytest_cache
+.env
+*.egg-info
+
+# CDK asset staging directory
+.cdk.staging
+cdk.out
+cdk.*.json

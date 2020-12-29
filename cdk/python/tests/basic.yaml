@@ -1,0 +1,125 @@
+Parameters:
+  AssetParameters9cc8199e0fe93d7f01d1b2b231bb687a12a00de795a274fecb02f7860538e214ArtifactHash:
+    Description: Artifact hash for asset "9cc8199e0fe93d7f01d1b2b231bb687a12a00de795a274fecb02f7860538e214"
+    Type: String
+  AssetParameters9cc8199e0fe93d7f01d1b2b231bb687a12a00de795a274fecb02f7860538e214S3Bucket:
+    Description: S3 bucket for asset "9cc8199e0fe93d7f01d1b2b231bb687a12a00de795a274fecb02f7860538e214"
+    Type: String
+  AssetParameters9cc8199e0fe93d7f01d1b2b231bb687a12a00de795a274fecb02f7860538e214S3VersionKey:
+    Description: S3 key for asset version "9cc8199e0fe93d7f01d1b2b231bb687a12a00de795a274fecb02f7860538e214"
+    Type: String
+Resources:
+  LambdaRole:
+    Properties:
+      AssumeRolePolicyDocument:
+        Statement:
+        - Action: sts:AssumeRole
+          Effect: Allow
+          Principal:
+            Service: lambda.amazonaws.com
+        Version: '2012-10-17'
+    Type: AWS::IAM::Role
+  LambdaRoleDefaultPolicy:
+    Properties:
+      PolicyDocument:
+        Statement:
+        - Action:
+          - cloudformation:*
+          - ec2:*
+          - lambda:*
+          - logs:*
+          - iam:*
+          - rds:*
+          - s3:*
+          Effect: Allow
+          Resource: '*'
+        Version: '2012-10-17'
+      PolicyName: LambdaRoleDefaultPolicy
+      Roles:
+      - Ref: LambdaRole
+    Type: AWS::IAM::Policy
+  minetesttest:
+    DependsOn:
+    - minetesttestInstanceRole
+    Properties:
+      AvailabilityZone: dummy1a
+      IamInstanceProfile:
+        Ref: minetesttestInstanceProfile
+      ImageId: ami-030d7f4bcfae3b935
+      InstanceType: t2.micro
+      KeyName: minetest
+      SecurityGroupIds:
+      - sg-05ab5779a25ef0938
+      SubnetId: p-12345
+      Tags:
+      - Key: Delete
+        Value: 0 18 . . .
+      - Key: Name
+        Value: minetest-test
+      - Key: Saving
+        Value: Enabled
+      UserData:
+        Fn::Base64: '#!/bin/bash
+
+          wget -O - https://raw.githubusercontent.com/bilardi/minetest/master/install.sh
+          | bash'
+    Type: AWS::EC2::Instance
+  minetesttestInstanceProfile:
+    Properties:
+      Roles:
+      - Ref: minetesttestInstanceRole
+    Type: AWS::IAM::InstanceProfile
+  minetesttestInstanceRole:
+    Properties:
+      AssumeRolePolicyDocument:
+        Statement:
+        - Action: sts:AssumeRole
+          Effect: Allow
+          Principal:
+            Service: ec2.amazonaws.com
+        Version: '2012-10-17'
+      Tags:
+      - Key: Delete
+        Value: 0 18 . . .
+      - Key: Name
+        Value: minetest-test
+      - Key: Saving
+        Value: Enabled
+    Type: AWS::IAM::Role
+  savingtest:
+    DependsOn:
+    - LambdaRoleDefaultPolicy
+    - LambdaRole
+    Properties:
+      Code:
+        S3Bucket:
+          Ref: AssetParameters9cc8199e0fe93d7f01d1b2b231bb687a12a00de795a274fecb02f7860538e214S3Bucket
+        S3Key:
+          Fn::Join:
+          - ''
+          - - Fn::Select:
+              - {}
+              - Fn::Split:
+                - '||'
+                - Ref: AssetParameters9cc8199e0fe93d7f01d1b2b231bb687a12a00de795a274fecb02f7860538e214S3VersionKey
+            - Fn::Select:
+              - {}
+              - Fn::Split:
+                - '||'
+                - Ref: AssetParameters9cc8199e0fe93d7f01d1b2b231bb687a12a00de795a274fecb02f7860538e214S3VersionKey
+      Handler: aws_saving/saving.main
+      MemorySize: {}
+      Role:
+        Fn::GetAtt:
+        - LambdaRole
+        - Arn
+      Runtime: python3.8
+      Tags:
+      - Key: Delete
+        Value: 0 18 . . .
+      - Key: Name
+        Value: saving-test
+      - Key: Saving
+        Value: Enabled
+      Timeout: {}
+    Type: AWS::Lambda::Function
