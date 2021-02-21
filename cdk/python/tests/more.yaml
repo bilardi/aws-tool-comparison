@@ -1,12 +1,12 @@
 Parameters:
-  AssetParameters9cc8199e0fe93d7f01d1b2b231bb687a12a00de795a274fecb02f7860538e214ArtifactHash:
-    Description: Artifact hash for asset "9cc8199e0fe93d7f01d1b2b231bb687a12a00de795a274fecb02f7860538e214"
+  AssetPArtifactHash:
+    Description: Artifact hash for asset ""
     Type: String
-  AssetParameters9cc8199e0fe93d7f01d1b2b231bb687a12a00de795a274fecb02f7860538e214S3Bucket:
-    Description: S3 bucket for asset "9cc8199e0fe93d7f01d1b2b231bb687a12a00de795a274fecb02f7860538e214"
+  AssetPS3Bucket:
+    Description: S3 bucket for asset ""
     Type: String
-  AssetParameters9cc8199e0fe93d7f01d1b2b231bb687a12a00de795a274fecb02f7860538e214S3VersionKey:
-    Description: S3 key for asset version "9cc8199e0fe93d7f01d1b2b231bb687a12a00de795a274fecb02f7860538e214"
+  AssetPS3VersionKey:
+    Description: S3 key for asset version ""
     Type: String
 Resources:
   LambdaRole:
@@ -142,7 +142,7 @@ Resources:
     Properties:
       Code:
         S3Bucket:
-          Ref: AssetParameters9cc8199e0fe93d7f01d1b2b231bb687a12a00de795a274fecb02f7860538e214S3Bucket
+          Ref: AssetPS3Bucket
         S3Key:
           Fn::Join:
           - ''
@@ -150,12 +150,12 @@ Resources:
               - {}
               - Fn::Split:
                 - '||'
-                - Ref: AssetParameters9cc8199e0fe93d7f01d1b2b231bb687a12a00de795a274fecb02f7860538e214S3VersionKey
+                - Ref: AssetPS3VersionKey
             - Fn::Select:
               - {}
               - Fn::Split:
                 - '||'
-                - Ref: AssetParameters9cc8199e0fe93d7f01d1b2b231bb687a12a00de795a274fecb02f7860538e214S3VersionKey
+                - Ref: AssetPS3VersionKey
       Handler: aws_saving/saving.main
       MemorySize: {}
       Role:

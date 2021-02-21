@@ -4,7 +4,7 @@ aws-cdk.aws-sns==1.80.0
 aws-cdk.aws-sns-subscriptions==1.80.0
 aws-cdk.core==1.80.0
 pyyaml
-aws-cdk-test-synth
+aws-cdk-test-synth>=0.0.4
 aws_simple_pipeline>=0.0.2
 aws-cdk.aws-codebuild>=1.62.0,<=1.80.0
 aws-cdk.aws-codepipeline>=1.62.0,<=1.80.0
