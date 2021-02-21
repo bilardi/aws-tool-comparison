@@ -58,6 +58,12 @@ Resources:
     - minetesttestInstanceRole
     Properties:
       AvailabilityZone: dummy1a
+      BlockDeviceMappings:
+      - DeviceName: /dev/xvda
+        Ebs:
+          DeleteOnTermination: {}
+          VolumeSize: {}
+          VolumeType: gp2
       IamInstanceProfile:
         Ref: minetesttestInstanceProfile
       ImageId: ami-030d7f4bcfae3b935

@@ -78,8 +78,7 @@ class More(Basic):
         return security_group
 
     def get_block_device(self, params):
-        volume = ec2.BlockDeviceVolume(self)
-        volume.ebs(
+        volume = ec2.BlockDeviceVolume.ebs(
             delete_on_termination=params['delete_on_termination'],
             volume_size=params['volume_size'],
             volume_type=ec2.EbsDeviceVolumeType(params['volume_type'])
@@ -95,7 +94,7 @@ class More(Basic):
             ec2_params['vpc'] = self.get_vpc(ec2_params)
         if 'security_group' not in ec2_params:
             ec2_params['security_group'] = self.get_security_group(ec2_params)
-        # block_device = self.get_block_device(ec2_params)
+        block_device = self.get_block_device(ec2_params)
         ec2_instance = ec2.Instance(self, self.ec2_name,
             machine_image=ec2.MachineImage.generic_linux(
                 ami_map={ec2_params['region']:ec2_params['ami_id']}
@@ -104,7 +103,7 @@ class More(Basic):
             security_group=ec2_params['security_group'],
             instance_type=ec2.InstanceType(ec2_params['instance_type']),
             key_name=ec2_params['key_name'],
-            # block_devices=[block_device]
+            block_devices=[block_device]
         )
         ec2_instance.user_data.add_commands(ec2_params['user_data'])
         self.add_tags(self.ec2_name, ec2_instance, ec2_params['tags'])
