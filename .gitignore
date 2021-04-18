@@ -28,6 +28,12 @@ __pycache__
 .env
 *.egg-info
 
+# typeScript
+dist
+*.js
+!jest.config.js
+*.d.ts
+
 # CDK asset staging directory
 .cdk.staging
 cdk.out

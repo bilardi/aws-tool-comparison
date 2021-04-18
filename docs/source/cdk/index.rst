@@ -9,6 +9,4 @@ You can find two examples in two different languages.
    :maxdepth: 1
 
    python
-
-Coming soon
-#   typescript
+   typescript

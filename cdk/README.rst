@@ -23,7 +23,7 @@ AWS CDK Toolkit has common cross languages commands: for initialization of the a
 
 .. code-block:: bash
 
-    export LANGUAGE=typeScript #, javascript, python, java, or csharp
+    export LANGUAGE=typescript #, javascript, python, java, or csharp
     cdk init app --language $LANGUAGE
 
 For listing the application stacks,

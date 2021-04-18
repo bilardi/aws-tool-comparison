@@ -1,0 +1,423 @@
+{
+  "Resources": {
+    "SecurityGroupDD263621": {
+      "Type": "AWS::EC2::SecurityGroup",
+      "Properties": {
+        "GroupDescription": "test/SecurityGroup",
+        "SecurityGroupEgress": [
+          {
+            "CidrIp": "0.0.0.0/0",
+            "Description": "Allow all outbound traffic by default",
+            "IpProtocol": "-1"
+          }
+        ],
+        "SecurityGroupIngress": [
+          {
+            "CidrIp": "0.0.0.0/0",
+            "Description": "from 0.0.0.0/0:sr",
+            "FromPort": 3000,
+            "IpProtocol": "udp",
+            "ToPort": 3000
+          }
+        ],
+        "VpcId": "vpc-12345"
+      }
+    },
+    "minetesttestInstanceRole2A475740": {
+      "Type": "AWS::IAM::Role",
+      "Properties": {
+        "AssumeRolePolicyDocument": {
+          "Statement": [
+            {
+              "Action": "sts:AssumeRole",
+              "Effect": "Allow",
+              "Principal": {
+                "Service": "ec2.amazonaws.com"
+              }
+            }
+          ],
+          "Version": "2012-10-17"
+        },
+        "Tags": [
+          {
+            "Key": "Delete",
+            "Value": "0 18 . . ."
+          },
+          {
+            "Key": "Name",
+            "Value": "minetest-test"
+          },
+          {
+            "Key": "Saving",
+            "Value": "Enabled"
+          }
+        ]
+      }
+    },
+    "minetesttestInstanceProfile84A488D7": {
+      "Type": "AWS::IAM::InstanceProfile",
+      "Properties": {
+        "Roles": [
+          {
+            "Ref": "minetesttestInstanceRole2A475740"
+          }
+        ]
+      }
+    },
+    "minetesttest4FB3D642": {
+      "Type": "AWS::EC2::Instance",
+      "Properties": {
+        "AvailabilityZone": "dummy1a",
+        "IamInstanceProfile": {
+          "Ref": "minetesttestInstanceProfile84A488D7"
+        },
+        "ImageId": "ami-02e64d6c81725f843",
+        "InstanceType": "t2.micro",
+        "KeyName": "minetest",
+        "SecurityGroupIds": [
+          {
+            "Fn::GetAtt": [
+              "SecurityGroupDD263621",
+              "GroupId"
+            ]
+          }
+        ],
+        "SubnetId": "p-12345",
+        "Tags": [
+          {
+            "Key": "Delete",
+            "Value": "0 18 . . ."
+          },
+          {
+            "Key": "Name",
+            "Value": "minetest-test"
+          },
+          {
+            "Key": "Saving",
+            "Value": "Enabled"
+          }
+        ],
+        "UserData": {
+          "Fn::Base64": "#!/bin/bash\nwget -O - https://raw.githubusercontent.com/bilardi/minetest/master/install.sh | bash"
+        }
+      },
+      "DependsOn": [
+        "minetesttestInstanceRole2A475740"
+      ]
+    },
+    "roleC7B7E775": {
+      "Type": "AWS::IAM::Role",
+      "Properties": {
+        "AssumeRolePolicyDocument": {
+          "Statement": [
+            {
+              "Action": "sts:AssumeRole",
+              "Effect": "Allow",
+              "Principal": {
+                "Service": "lambda.amazonaws.com"
+              }
+            }
+          ],
+          "Version": "2012-10-17"
+        }
+      }
+    },
+    "roleDefaultPolicy7C980EBA": {
+      "Type": "AWS::IAM::Policy",
+      "Properties": {
+        "PolicyDocument": {
+          "Statement": [
+            {
+              "Action": [
+                "cloudformation:*",
+                "ec2:*",
+                "lambda:*",
+                "logs:*",
+                "iam:*",
+                "rds:*",
+                "s3:*"
+              ],
+              "Effect": "Allow",
+              "Resource": "*"
+            }
+          ],
+          "Version": "2012-10-17"
+        },
+        "PolicyName": "roleDefaultPolicy7C980EBA",
+        "Roles": [
+          {
+            "Ref": "roleC7B7E775"
+          }
+        ]
+      }
+    },
+    "savingtestServiceRole6699E677": {
+      "Type": "AWS::IAM::Role",
+      "Properties": {
+        "AssumeRolePolicyDocument": {
+          "Statement": [
+            {
+              "Action": "sts:AssumeRole",
+              "Effect": "Allow",
+              "Principal": {
+                "Service": "lambda.amazonaws.com"
+              }
+            }
+          ],
+          "Version": "2012-10-17"
+        },
+        "ManagedPolicyArns": [
+          {
+            "Fn::Join": [
+              "",
+              [
+                "arn:",
+                {
+                  "Ref": "AWS::Partition"
+                },
+                ":iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
+              ]
+            ]
+          }
+        ],
+        "Tags": [
+          {
+            "Key": "Delete",
+            "Value": "0 18 . . ."
+          },
+          {
+            "Key": "Name",
+            "Value": "saving-test"
+          },
+          {
+            "Key": "Saving",
+            "Value": "Enabled"
+          }
+        ]
+      }
+    },
+    "savingtest43CD6734": {
+      "Type": "AWS::Lambda::Function",
+      "Properties": {
+        "Code": {
+          "S3Bucket": {
+            "Ref": "AssetParameters13970c880b26171abdc292993ff0a369da21ff9ee8741fd3035f3739906859e4S3BucketF39E559B"
+          },
+          "S3Key": {
+            "Fn::Join": [
+              "",
+              [
+                {
+                  "Fn::Select": [
+                    0,
+                    {
+                      "Fn::Split": [
+                        "||",
+                        {
+                          "Ref": "AssetParameters13970c880b26171abdc292993ff0a369da21ff9ee8741fd3035f3739906859e4S3VersionKeyC5F0FC51"
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "Fn::Select": [
+                    1,
+                    {
+                      "Fn::Split": [
+                        "||",
+                        {
+                          "Ref": "AssetParameters13970c880b26171abdc292993ff0a369da21ff9ee8741fd3035f3739906859e4S3VersionKeyC5F0FC51"
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            ]
+          }
+        },
+        "Role": {
+          "Fn::GetAtt": [
+            "savingtestServiceRole6699E677",
+            "Arn"
+          ]
+        },
+        "Handler": "aws_saving/saving.main",
+        "MemorySize": 512,
+        "Runtime": "python3.8",
+        "Tags": [
+          {
+            "Key": "Delete",
+            "Value": "0 18 . . ."
+          },
+          {
+            "Key": "Name",
+            "Value": "saving-test"
+          },
+          {
+            "Key": "Saving",
+            "Value": "Enabled"
+          }
+        ],
+        "Timeout": 300
+      },
+      "DependsOn": [
+        "savingtestServiceRole6699E677"
+      ]
+    },
+    "minetesttestAlarmB639908D": {
+      "Type": "AWS::CloudWatch::Alarm",
+      "Properties": {
+        "ComparisonOperator": "GreaterThanOrEqualToThreshold",
+        "EvaluationPeriods": 2,
+        "AlarmActions": [
+          {
+            "Ref": "TopicBFC7AF6E"
+          }
+        ],
+        "AlarmDescription": "CPUUtilization of minetest-test on AWS 1234567890",
+        "AlarmName": "CPUUtilization of minetest-test on AWS 1234567890",
+        "Dimensions": [
+          {
+            "Name": "InstanceName",
+            "Value": "minetest-test"
+          }
+        ],
+        "MetricName": "CPUUtilization",
+        "Namespace": "AWS/EC2",
+        "OKActions": [
+          {
+            "Ref": "TopicBFC7AF6E"
+          }
+        ],
+        "Period": 300,
+        "Statistic": "Average",
+        "Threshold": 100,
+        "TreatMissingData": "missing"
+      }
+    },
+    "minetesttestDashboardC1A8F0AC": {
+      "Type": "AWS::CloudWatch::Dashboard",
+      "Properties": {
+        "DashboardBody": {
+          "Fn::Join": [
+            "",
+            [
+              "{\"widgets\":[{\"type\":\"metric\",\"width\":12,\"height\":6,\"x\":0,\"y\":0,\"properties\":{\"view\":\"timeSeries\",\"region\":\"",
+              {
+                "Ref": "AWS::Region"
+              },
+              "\",\"metrics\":[[\"AWS/EC2\",\"CPUUtilization\",\"InstanceId\",\"minetest-test\"]],\"yAxis\":{}}},{\"type\":\"metric\",\"width\":12,\"height\":6,\"x\":12,\"y\":0,\"properties\":{\"view\":\"timeSeries\",\"region\":\"",
+              {
+                "Ref": "AWS::Region"
+              },
+              "\",\"metrics\":[[\"AWS/EC2\",\"NetworkIn\",\"InstanceId\",\"minetest-test\"]],\"yAxis\":{}}},{\"type\":\"metric\",\"width\":12,\"height\":6,\"x\":0,\"y\":6,\"properties\":{\"view\":\"timeSeries\",\"region\":\"",
+              {
+                "Ref": "AWS::Region"
+              },
+              "\",\"metrics\":[[\"AWS/EC2\",\"StatusCheckFailed_Instance\",\"InstanceId\",\"minetest-test\"]],\"yAxis\":{}}},{\"type\":\"metric\",\"width\":12,\"height\":6,\"x\":12,\"y\":6,\"properties\":{\"view\":\"timeSeries\",\"region\":\"",
+              {
+                "Ref": "AWS::Region"
+              },
+              "\",\"metrics\":[[\"AWS/EC2\",\"StatusCheckFailed_System\",\"InstanceId\",\"minetest-test\"]],\"yAxis\":{}}}]}"
+            ]
+          ]
+        },
+        "DashboardName": "minetest-test"
+      }
+    },
+    "savingtestAlarm577A2B37": {
+      "Type": "AWS::CloudWatch::Alarm",
+      "Properties": {
+        "ComparisonOperator": "GreaterThanOrEqualToThreshold",
+        "EvaluationPeriods": 2,
+        "AlarmActions": [
+          {
+            "Ref": "TopicBFC7AF6E"
+          }
+        ],
+        "AlarmDescription": "Errors of saving-test on AWS 1234567890",
+        "AlarmName": "Errors of saving-test on AWS 1234567890",
+        "Dimensions": [
+          {
+            "Name": "FunctionName",
+            "Value": "saving-test"
+          }
+        ],
+        "MetricName": "Errors",
+        "Namespace": "AWS/Lambda",
+        "OKActions": [
+          {
+            "Ref": "TopicBFC7AF6E"
+          }
+        ],
+        "Period": 60,
+        "Statistic": "Average",
+        "Threshold": 1,
+        "TreatMissingData": "missing"
+      }
+    },
+    "savingtestDashboardB38C132D": {
+      "Type": "AWS::CloudWatch::Dashboard",
+      "Properties": {
+        "DashboardBody": {
+          "Fn::Join": [
+            "",
+            [
+              "{\"widgets\":[{\"type\":\"metric\",\"width\":12,\"height\":6,\"x\":0,\"y\":0,\"properties\":{\"view\":\"timeSeries\",\"region\":\"",
+              {
+                "Ref": "AWS::Region"
+              },
+              "\",\"metrics\":[[\"AWS/Lambda\",\"Invocations\",\"FunctionName\",\"saving-test\"]],\"yAxis\":{}}},{\"type\":\"metric\",\"width\":12,\"height\":6,\"x\":12,\"y\":0,\"properties\":{\"view\":\"timeSeries\",\"region\":\"",
+              {
+                "Ref": "AWS::Region"
+              },
+              "\",\"metrics\":[[\"AWS/Lambda\",\"Errors\",\"FunctionName\",\"saving-test\"]],\"yAxis\":{}}},{\"type\":\"metric\",\"width\":12,\"height\":6,\"x\":0,\"y\":6,\"properties\":{\"view\":\"timeSeries\",\"region\":\"",
+              {
+                "Ref": "AWS::Region"
+              },
+              "\",\"metrics\":[[\"AWS/Lambda\",\"ConcurrentExecutions\",\"FunctionName\",\"saving-test\"]],\"yAxis\":{}}},{\"type\":\"metric\",\"width\":12,\"height\":6,\"x\":12,\"y\":6,\"properties\":{\"view\":\"timeSeries\",\"region\":\"",
+              {
+                "Ref": "AWS::Region"
+              },
+              "\",\"metrics\":[[\"AWS/Lambda\",\"Duration\",\"FunctionName\",\"saving-test\"]],\"yAxis\":{}}}]}"
+            ]
+          ]
+        },
+        "DashboardName": "saving-test"
+      }
+    },
+    "TopicBFC7AF6E": {
+      "Type": "AWS::SNS::Topic",
+      "Properties": {
+        "DisplayName": "My alarms",
+        "TopicName": "alarms-sns"
+      }
+    },
+    "TopicmyemailnetC1EB31AD": {
+      "Type": "AWS::SNS::Subscription",
+      "Properties": {
+        "Protocol": "email",
+        "TopicArn": {
+          "Ref": "TopicBFC7AF6E"
+        },
+        "Endpoint": "my@email.net"
+      }
+    }
+  },
+  "Parameters": {
+    "AssetParameters13970c880b26171abdc292993ff0a369da21ff9ee8741fd3035f3739906859e4S3BucketF39E559B": {
+      "Type": "String",
+      "Description": "S3 bucket for asset \"13970c880b26171abdc292993ff0a369da21ff9ee8741fd3035f3739906859e4\""
+    },
+    "AssetParameters13970c880b26171abdc292993ff0a369da21ff9ee8741fd3035f3739906859e4S3VersionKeyC5F0FC51": {
+      "Type": "String",
+      "Description": "S3 key for asset version \"13970c880b26171abdc292993ff0a369da21ff9ee8741fd3035f3739906859e4\""
+    },
+    "AssetParameters13970c880b26171abdc292993ff0a369da21ff9ee8741fd3035f3739906859e4ArtifactHash9EE8D3AB": {
+      "Type": "String",
+      "Description": "Artifact hash for asset \"13970c880b26171abdc292993ff0a369da21ff9ee8741fd3035f3739906859e4\""
+    }
+  }
+}

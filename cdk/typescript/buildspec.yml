@@ -1,0 +1,14 @@
+version: 0.2
+phases:
+  install:
+    commands:
+      - 'bash ${PWD}/cdk/typescript/build.sh'
+  build:
+    commands:
+      - 'STAGE=$ENV bash ${PWD}/cdk/typescript/deploy.sh'
+cache:
+  paths:
+    - '**/*'
+artifacts:
+  files:
+    - '**/*'
