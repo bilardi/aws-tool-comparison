@@ -41,7 +41,7 @@ export class Basic extends cdk.Stack {
   }
 
   getVpc(ec2Params: {[key: string]: any}): ec2.IVpc {
-    return ec2.Vpc.fromLookup(this, "vpc", ec2Params.vpcId);
+    return ec2.Vpc.fromLookup(this, "vpc", { vpcId: ec2Params.vpcId });
   }
 
   getSecurityGroup(ec2Params: {[key: string]: any}): ec2.ISecurityGroup {

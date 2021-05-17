@@ -58,7 +58,7 @@ export class More extends Basic {
         vpc = ec2Params.vpc;
     } else {
       if ("vpcId" in ec2Params && ec2Params.vpcId) {
-        vpc = ec2.Vpc.fromLookup(this, "vpc", ec2Params.vpcId);
+        vpc = ec2.Vpc.fromLookup(this, "vpc", { vpcId: ec2Params.vpcId });
       } else {
         vpc = ec2.Vpc.fromLookup(this, "vpc", { isDefault: true });
       }
